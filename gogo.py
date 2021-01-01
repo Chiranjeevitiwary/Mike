@@ -2,10 +2,10 @@ import speech_recognition as sr
 from requests import get
 import pyttsx3, datetime
 import webbrowser
-import wikipedia
-import os
-import cv2
-import random
+import wikipedia,  sys
+import os, cv2, random
+import pywhatkit, smtplib
+
 
 engine = pyttsx3.init("sapi5")
 voices= engine.getProperty('voices')
@@ -14,6 +14,7 @@ engine.setProperty('voices',voices[0].id)
 
 def speak(audio):
     engine.say(audio)
+    print(audio)
     engine.runAndWait()
 
 
@@ -43,10 +44,19 @@ def wish():
         speak("Good Evening")
     speak("Hi i am Mike. Please tell me how can i help you?")
 
-if __name__== "__main__":
+
+def sendEmail(to, content):
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    server.login('ghayilak@gmail.com', 'imghayila5')
+    server.sendmail('ghayilak@gmail.com',to,content)
+    server.close()
+
+
+if __name__ == "__main__":
     wish()
     while True:
-
         query = takecommand().lower()
         if "open notepad" in query:
              npath = "C:\\WINDOWS\\system32\\notepad.exe"
@@ -97,3 +107,37 @@ if __name__== "__main__":
             cm = takecommand().lower()
             webbrowser.open(f"{cm}")
 
+        elif "send message" in query:
+            x = datetime.datetime.now().hour
+            y = datetime.datetime.now().minute+2
+
+            pywhatkit.sendwhatmsg("+918969442807",'Hi bro how r u?',x,y)
+
+        elif "play song on youtube" in query:
+            speak("Which song do you want to play?")
+            sng = takecommand().lower()
+            pywhatkit.playonyt(f"{sng}")
+
+        elif "send email" in query:
+            try:
+                speak('what should i say?')
+                content = takecommand().lower()
+                to = 'ghayilak@gmail.com'
+                sendEmail(to, content)
+                speak('Email has been sent to recepient')
+            except Exception as e:
+                print(e)
+                speak('Sorry Sir! I am not able to send the mail right now')
+
+        elif "no thanks" or 'exit' in query:
+            speak('Thanks for using me sir, Have a good day')
+            wi = takecommand().lower()
+            if "same to you" or 'you too' in wi:
+                speak('Welcome Sir')
+                sys.exit()
+            else:
+                sys.exit()
+
+
+
+        speak('Sir do you have any other work?')
